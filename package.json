@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "test": "npm run build && node test-all.js",
     "export:pdf": "node dist/core/exporter.js --format pdf",
     "export:word": "node dist/core/exporter.js --format word",
     "setup": "bash scripts/setup.sh"
