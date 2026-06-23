@@ -244,6 +244,21 @@ console.log(parsed.resume);     // 解析出的结构化数据
 console.log(parsed.aiPrompt);   // 用于 AI 精确解析的 Prompt
 ```
 
+```typescript
+import { quickGenerateInterview } from 'project-resume-skill';
+
+// 场景 4：生成面试问答
+const interview = await quickGenerateInterview({
+  projectPath: '/path/to/your/project',
+  targetRole: '高级前端工程师',
+  lang: 'zh',
+  questionsPerCategory: 3,
+  focusCategories: ['tech-stack', 'architecture'],
+});
+console.log(interview.markdown);   // Markdown 面试问答
+console.log(interview.aiPrompt);   // AI 生成 Prompt
+```
+
 ---
 
 ## 🔌 平台安装指南
@@ -261,10 +276,16 @@ cp /path/to/skill/src/adapters/claude-code/CLAUDE.md ./
 
 使用方式：
 ```
+# 简历生成
 /generate-resume                    # 从零生成
 /generate-resume --lang en          # 英文简历
 /generate-resume --role 前端工程师   # 针对特定岗位
 /import-resume                      # 导入已有简历
+
+# 面试问答
+/generate-interview                 # 生成面试问答
+/generate-interview --role 前端工程师
+/deep-dive React                    # 针对 React 生成追问链
 ```
 
 **全局安装**：
@@ -687,9 +708,8 @@ npm run export:word
 ### 测试
 
 ```bash
-# 编译并运行测试
-npm run build
-node test.js
+# 编译并运行全面测试（81 个测试点）
+npm test
 ```
 
 ---
@@ -748,7 +768,7 @@ node test.js
 
 ### 2. 源码深度分析（适合进阶准备）
 
-📖 [docs/code-interview-analysis.md](code-interview-analysis.md)
+📖 [docs/code-interview-analysis.md](docs/code-interview-analysis.md)
 
 基于**实际源码**逐模块分析，标注具体代码行号，涵盖 **18 个深度问题**：
 
