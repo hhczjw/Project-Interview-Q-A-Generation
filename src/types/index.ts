@@ -196,7 +196,8 @@ export type QuestionDifficulty = 'basic' | 'intermediate' | 'advanced' | 'expert
 
 /** 面试问题类别 */
 export type QuestionCategory =
-  | 'tech-stack'        // 技术栈原理
+  | 'tech-stack'        // 技术栈原理（结合项目）
+  | 'tech-fundamentals' // 技术八股文（脱离项目的基础原理题）
   | 'architecture'      // 架构设计
   | 'project-detail'    // 项目细节
   | 'problem-solving'   // 问题解决

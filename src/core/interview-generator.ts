@@ -74,9 +74,14 @@ export class InterviewGenerator {
     // 基于项目信息自动生成基础问题
     const questions: InterviewQA[] = [];
 
-    // 技术栈相关问题
+    // 技术栈相关问题（结合项目）
     for (const tech of allTechs.slice(0, 5)) {
       questions.push(this.createTechQuestion(tech, options.lang || 'zh'));
+    }
+
+    // 技术八股文问题（脱离项目的基础原理题）
+    for (const tech of allTechs.slice(0, 5)) {
+      questions.push(this.createFundamentalsQuestion(tech, options.lang || 'zh'));
     }
 
     // 架构相关问题
@@ -199,9 +204,105 @@ export class InterviewGenerator {
     };
   }
 
+  /**
+   * 创建技术八股文问题（脱离项目的基础原理题）
+   */
+  private createFundamentalsQuestion(tech: string, lang: ResumeLang): InterviewQA {
+    const isZh = lang !== 'en';
+
+    // 预定义的八股文问题库
+    const fundamentalsDB: Record<string, { zh: string; en: string; difficulty: QuestionDifficulty; keyPoints: string[] }[]> = {
+      'React': [
+        { zh: '请解释 React 的虚拟 DOM 是什么？它和真实 DOM 的关系是什么？', en: 'What is React\'s virtual DOM? How does it relate to the real DOM?', difficulty: 'basic', keyPoints: ['虚拟 DOM 是 JS 对象树', 'diff 算法比较差异', '批量更新真实 DOM'] },
+        { zh: 'React 的 Fiber 架构是什么？它解决了什么问题？', en: 'What is React Fiber architecture? What problem does it solve?', difficulty: 'advanced', keyPoints: ['可中断的渲染', '优先级调度', '解决大型应用卡顿'] },
+        { zh: 'React 中 useEffect 和 useLayoutEffect 的区别是什么？', en: 'What\'s the difference between useEffect and useLayoutEffect?', difficulty: 'intermediate', keyPoints: ['useEffect 异步执行', 'useLayoutEffect 同步执行', '渲染时机不同'] },
+      ],
+      'Vue': [
+        { zh: 'Vue 的响应式原理是什么？Vue 2 和 Vue 3 有什么区别？', en: 'What is Vue\'s reactivity principle? What\'s the difference between Vue 2 and Vue 3?', difficulty: 'basic', keyPoints: ['Vue 2 用 Object.defineProperty', 'Vue 3 用 Proxy', '依赖收集和触发更新'] },
+        { zh: 'Vue 的 nextTick 是什么原理？', en: 'What is the principle behind Vue\'s nextTick?', difficulty: 'intermediate', keyPoints: ['微任务/宏任务', 'DOM 更新后执行', '异步批量更新'] },
+      ],
+      'TypeScript': [
+        { zh: 'TypeScript 中 type 和 interface 的区别是什么？', en: 'What\'s the difference between type and interface in TypeScript?', difficulty: 'basic', keyPoints: ['interface 可扩展', 'type 支持联合类型', 'interface 支持声明合并'] },
+        { zh: 'TypeScript 的泛型是什么？什么场景下使用？', en: 'What are TypeScript generics? When would you use them?', difficulty: 'intermediate', keyPoints: ['类型参数化', '代码复用', '类型安全'] },
+      ],
+      'JavaScript': [
+        { zh: '请解释 JavaScript 的事件循环（Event Loop）机制', en: 'Explain JavaScript\'s Event Loop mechanism', difficulty: 'basic', keyPoints: ['调用栈', '任务队列', '微任务优先'] },
+        { zh: 'JavaScript 的闭包是什么？有什么应用场景？', en: 'What is a closure in JavaScript? What are its use cases?', difficulty: 'basic', keyPoints: ['函数访问外部变量', '数据私有化', '防抖节流'] },
+        { zh: 'JavaScript 的原型链是什么？', en: 'What is the prototype chain in JavaScript?', difficulty: 'intermediate', keyPoints: ['__proto__ 指向', '继承机制', '属性查找'] },
+      ],
+      'Node.js': [
+        { zh: 'Node.js 的事件循环和浏览器的有什么区别？', en: 'How does Node.js event loop differ from browser\'s?', difficulty: 'intermediate', keyPoints: ['6 个阶段', 'process.nextTick', 'setImmediate'] },
+        { zh: 'Node.js 的 Stream 是什么？有哪些类型？', en: 'What is a Stream in Node.js? What types are there?', difficulty: 'intermediate', keyPoints: ['Readable/Writable/Duplex/Transform', '背压处理', '管道操作'] },
+      ],
+      'Redis': [
+        { zh: 'Redis 有哪几种数据结构？各有什么应用场景？', en: 'What data structures does Redis have? What are their use cases?', difficulty: 'basic', keyPoints: ['String/Hash/List/Set/ZSet', '缓存/计数器/排行榜'] },
+        { zh: 'Redis 的持久化机制是什么？RDB 和 AOF 的区别？', en: 'What is Redis persistence? Difference between RDB and AOF?', difficulty: 'intermediate', keyPoints: ['RDB 快照', 'AOF 日志追加', '混合持久化'] },
+        { zh: 'Redis 的缓存穿透、击穿、雪崩是什么？怎么解决？', en: 'What are cache penetration, breakdown, and avalanche? How to solve them?', difficulty: 'advanced', keyPoints: ['穿透：查不存在的 key', '击穿：热点 key 过期', '雪崩：大量 key 同时过期'] },
+      ],
+      'MySQL': [
+        { zh: 'MySQL 的索引是什么？B+ 树索引的原理是什么？', en: 'What is a MySQL index? How does B+ tree index work?', difficulty: 'basic', keyPoints: ['B+ 树结构', '聚簇索引 vs 非聚簇索引', '索引覆盖'] },
+        { zh: 'MySQL 的事务隔离级别有哪些？各自解决了什么问题？', en: 'What are MySQL transaction isolation levels?', difficulty: 'intermediate', keyPoints: ['读未提交/读已提交/可重复读/串行化', '脏读/不可重复读/幻读'] },
+      ],
+      'MongoDB': [
+        { zh: 'MongoDB 和 MySQL 的区别是什么？什么场景用 MongoDB？', en: 'What\'s the difference between MongoDB and MySQL? When to use MongoDB?', difficulty: 'basic', keyPoints: ['文档型 vs 关系型', '灵活 schema', '适合非结构化数据'] },
+      ],
+      'Docker': [
+        { zh: 'Docker 的镜像和容器是什么关系？', en: 'What is the relationship between Docker images and containers?', difficulty: 'basic', keyPoints: ['镜像是模板', '容器是实例', '分层存储'] },
+        { zh: 'Dockerfile 中 CMD 和 ENTRYPOINT 的区别是什么？', en: 'What\'s the difference between CMD and ENTRYPOINT in Dockerfile?', difficulty: 'intermediate', keyPoints: ['CMD 可被覆盖', 'ENTRYPOINT 不可被覆盖', '组合使用'] },
+      ],
+      'Webpack': [
+        { zh: 'Webpack 的构建流程是什么？Loader 和 Plugin 的区别？', en: 'What is Webpack\'s build process? Difference between Loader and Plugin?', difficulty: 'intermediate', keyPoints: ['Loader 转换文件', 'Plugin 扩展功能', '编译-优化-输出'] },
+      ],
+      'Vite': [
+        { zh: 'Vite 为什么比 Webpack 快？它的原理是什么？', en: 'Why is Vite faster than Webpack? What\'s its principle?', difficulty: 'intermediate', keyPoints: ['ESM 原生模块', '按需编译', '开发时不打包'] },
+      ],
+      'Redux': [
+        { zh: 'Redux 的数据流是怎样的？', en: 'What is Redux\'s data flow?', difficulty: 'basic', keyPoints: ['Action → Reducer → Store → View', '单向数据流', '纯函数更新'] },
+        { zh: 'Redux 中间件是什么原理？', en: 'What is the principle behind Redux middleware?', difficulty: 'intermediate', keyPoints: ['洋葱模型', 'dispatch 增强', 'compose 组合'] },
+      ],
+      'Kafka': [
+        { zh: 'Kafka 是什么？它的架构是怎样的？', en: 'What is Kafka? What\'s its architecture?', difficulty: 'basic', keyPoints: ['分布式消息队列', 'Topic/Partition/Consumer Group', '高吞吐'] },
+      ],
+      'Nginx': [
+        { zh: 'Nginx 的反向代理和正向代理有什么区别？', en: 'What\'s the difference between reverse proxy and forward proxy in Nginx?', difficulty: 'basic', keyPoints: ['正向代理代理客户端', '反向代理代理服务器', '负载均衡'] },
+      ],
+    };
+
+    // 查找该技术的八股文问题
+    const techQuestions = fundamentalsDB[tech] || fundamentalsDB[tech.charAt(0).toUpperCase() + tech.slice(1)];
+
+    if (techQuestions && techQuestions.length > 0) {
+      // 随机选一个问题
+      const q = techQuestions[Math.floor(Math.random() * techQuestions.length)];
+      return {
+        id: v4(),
+        question: isZh ? q.zh : q.en,
+        answer: '',
+        difficulty: q.difficulty,
+        category: 'tech-fundamentals',
+        keyPoints: q.keyPoints,
+      };
+    }
+
+    // 如果没有预定义问题，生成通用的八股文问题
+    return {
+      id: v4(),
+      question: isZh
+        ? `请介绍一下 ${tech} 的核心概念和原理？`
+        : `What are the core concepts and principles of ${tech}?`,
+      answer: '',
+      difficulty: 'basic',
+      category: 'tech-fundamentals',
+      keyPoints: isZh
+        ? [`${tech} 的核心概念`, '工作原理', '常见应用场景']
+        : [`Core concepts of ${tech}`, 'How it works', 'Common use cases'],
+    };
+  }
+
   private categoryLabel(cat: QuestionCategory): string {
     const labels: Record<QuestionCategory, string> = {
-      'tech-stack': '技术栈原理',
+      'tech-stack': '技术栈原理（结合项目）',
+      'tech-fundamentals': '技术八股文（基础原理）',
       'architecture': '架构设计',
       'project-detail': '项目细节',
       'problem-solving': '问题解决',
@@ -268,37 +369,46 @@ export class InterviewGenerator {
 
 请为以下每个类别生成 {{QUESTIONS_PER_CATEGORY}} 个问题：
 
-### 1. 技术栈原理（tech-stack）
-针对项目中使用的技术，追问底层原理。
-- 不要问 "什么是 React" 这种基础题
+### 1. 技术栈原理（tech-stack）— 结合项目
+针对项目中使用的技术，追问在项目中的实际应用和原理。
 - 要问 "React 的 Fiber 架构是怎么工作的？你们项目中有没有遇到 reconciliation 的性能问题？"
-- 由浅入深，从使用 → 原理 → 优化
+- 由浅入深，从项目使用 → 原理 → 优化
+- 必须结合项目实际场景
 
-### 2. 架构设计（architecture）
+### 2. 技术八股文（tech-fundamentals）— 脱离项目
+针对项目中使用的技术，考察基础原理知识（八股文）。
+- 问 "React 的虚拟 DOM 是什么？" 这类基础原理题
+- 问 "Redux 的数据流是怎样的？"
+- 问 "Redis 的缓存穿透、击穿、雪崩是什么？"
+- 不需要结合项目，纯粹考察技术功底
+- 覆盖项目用到的每项核心技术
+- 由易到难：基础概念 → 核心原理 → 高级特性
+
+### 3. 架构设计（architecture）
 针对项目架构选型，追问设计决策。
 - "为什么选择这个架构？考虑过其他方案吗？"
 - "架构中最大的技术债务是什么？"
 - "如果重新设计，你会做什么改变？"
 
-### 3. 项目细节（project-detail）
+### 4. 项目细节（project-detail）
 针对项目亮点，追问实现细节。
 - "你简历里提到的 XX 优化，具体是怎么做的？"
 - "遇到过什么线上问题？怎么排查和解决的？"
 - "这个项目中你最骄傲的技术决策是什么？"
 
-### 4. 问题解决（problem-solving）
+### 5. 问题解决（problem-solving）
 假设场景题，考察解决问题的能力。
 - "如果线上突然出现 XX 问题，你会怎么排查？"
 - "如果需求变更为 XX，你怎么调整架构？"
 - "如果要支持 10 倍流量，你需要做什么？"
 
-### 5. 性能优化（performance）
+### 6. 性能优化（performance）
 针对项目性能相关的问题。
 - "你们项目的性能瓶颈在哪？怎么优化的？"
 - "首屏加载时间是多少？做了哪些优化？"
 - "数据库查询有没有优化过？怎么做的？"
 
-### 6. 最佳实践（best-practices）
+### 7. 最佳实践（best-practices）
 考察工程素养和规范。
 - "你们的代码规范是什么？怎么保证执行？"
 - "Git 分支策略是什么？"

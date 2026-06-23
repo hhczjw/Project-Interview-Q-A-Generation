@@ -201,7 +201,8 @@ export class InterviewManager {
 
   private categoryLabel(cat: QuestionCategory): string {
     const labels: Record<QuestionCategory, string> = {
-      'tech-stack': '🔧 技术栈原理',
+      'tech-stack': '🔧 技术栈原理（结合项目）',
+      'tech-fundamentals': '📖 技术八股文（基础原理）',
       'architecture': '🏗️ 架构设计',
       'project-detail': '📋 项目细节',
       'problem-solving': '🧩 问题解决',
