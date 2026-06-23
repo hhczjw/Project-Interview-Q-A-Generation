@@ -1,0 +1,27 @@
+{
+  "name": "project-resume-skill",
+  "version": "1.0.0",
+  "description": "根据项目自动生成简历的跨平台 AI Coding Skill",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "export:pdf": "node dist/core/exporter.js --format pdf",
+    "export:word": "node dist/core/exporter.js --format word",
+    "setup": "bash scripts/setup.sh"
+  },
+  "keywords": ["resume", "skill", "ai-coding", "claude-code", "cursor"],
+  "license": "MIT",
+  "dependencies": {
+    "docx": "^8.5.0",
+    "glob": "^10.3.0",
+    "mammoth": "^1.8.0",
+    "marked": "^12.0.0",
+    "pdf-parse": "^1.1.1",
+    "puppeteer": "^22.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.11.0"
+  }
+}

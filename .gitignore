@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+
+# 导出的简历文件（用户数据）
+data/exports/*.pdf
+data/exports/*.docx
+data/exports/*.html
+
+# 但保留目录结构
+!data/**/.gitkeep
