@@ -2,19 +2,15 @@
 
 > 根据当前项目自动生成资深面试官问答，帮助你准备技术面试
 
-## 使用方式
+## 触发方式
 
-在 Claude Code 中执行以下命令：
+当用户说出以下意图时，启动面试问答生成流程：
 
-```
-/generate-interview              # 根据当前项目生成面试问答
-/generate-interview --role 前端工程师  # 针对特定岗位生成
-/generate-interview --focus tech-stack # 重点关注技术栈原理
-/generate-interview --difficulty advanced  # 只生成高级问题
-/deep-dive React                 # 针对 React 生成追问链
-/manage-interview                # 管理已有面试问答
-/export-interview                # 导出为 Markdown
-```
+- "帮我准备面试" / "生成面试题" / "面试问答"
+- "根据项目准备面试" / "根据这个项目生成面试问答"
+- "generate interview" / "interview questions"
+- "针对 React 追问" / "深度追问 Redux"
+- "管理面试问答" / "导出面试问答"
 
 ## Skill 行为规范
 

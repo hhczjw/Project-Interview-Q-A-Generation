@@ -2,21 +2,16 @@
 
 > 根据当前项目自动生成专业简历，支持导入已有简历、中英文、多格式导出、简历管理
 
-## 使用方式
+## 触发方式
 
-在 Claude Code 中执行以下命令：
+当用户说出以下意图时，启动简历生成流程：
 
-```
-/generate-resume              # 一键根据当前项目生成简历
-/generate-resume --lang en    # 生成英文简历
-/generate-resume --lang both  # 生成中英双语简历
-/generate-resume --role 前端工程师  # 针对特定岗位优化
-/generate-resume --import ./my-resume.pdf  # 在已有简历基础上补充项目
-/import-resume                # 导入已有简历（PDF/Word/Markdown）
-/manage-resume                # 管理已有简历（列出/编辑/删除/导出）
-/optimize-resume              # 根据反馈优化简历内容
-/export-resume                # 导出简历为 PDF/Word/Markdown
-```
+- "帮我生成简历" / "写简历" / "根据项目生成简历"
+- "generate resume" / "create resume"
+- "我有一份简历，想补充项目经历"
+- "补充简历" / "更新简历" / "在简历里加项目"
+- "导出简历" / "导出 PDF" / "导出 Word"
+- "管理简历" / "列出简历" / "删除简历"
 
 ## Skill 行为规范
 
