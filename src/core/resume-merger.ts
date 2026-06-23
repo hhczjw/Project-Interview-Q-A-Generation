@@ -249,21 +249,24 @@ export class ResumeMerger {
 
   /**
    * 判断两个项目是否相似（同名或高度重叠）
+   *
+   * 策略：以名称匹配为主，技术栈仅辅助判断
+   * - 名称完全匹配 → 相似
+   * - 名称包含关系（如 "电商平台" vs "电商平台后台"）→ 相似
+   * - 名称完全不同 → 不相似（即使技术栈相同，也可能是不同项目）
    */
   private isSimilarProject(a: ProjectEntry, b: ProjectEntry): boolean {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+
     // 名称完全匹配
-    if (a.name.toLowerCase() === b.name.toLowerCase()) return true;
+    if (nameA === nameB) return true;
 
-    // 名称包含关系
-    if (a.name.toLowerCase().includes(b.name.toLowerCase()) ||
-      b.name.toLowerCase().includes(a.name.toLowerCase())) return true;
+    // 名称包含关系（如 "电商平台" 和 "电商平台后台"）
+    if (nameA.includes(nameB) || nameB.includes(nameA)) return true;
 
-    // 技术栈重叠度超过 70%
-    const aTechs = new Set(a.techStack.map(t => t.toLowerCase()));
-    const bTechs = b.techStack.map(t => t.toLowerCase());
-    const overlap = bTechs.filter(t => aTechs.has(t)).length;
-    if (bTechs.length > 0 && overlap / bTechs.length > 0.7) return true;
-
+    // 名称完全不同 → 视为不同项目
+    // （不同项目使用相同技术栈是很常见的，如多个 React 项目）
     return false;
   }
 

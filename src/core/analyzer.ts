@@ -360,8 +360,10 @@ export class ProjectAnalyzer {
       const firstCommitDate = exec('git log --reverse --format=%ai --max-count=1');
       const lastCommitDate = exec('git log --format=%ai --max-count=1');
 
-      // 获取提交统计
-      const shortstat = exec('git diff --shortstat HEAD~10 HEAD');
+      // 获取提交统计（最近 10 次提交，如果不足 10 次则取全部）
+      const commitCount = totalCommits;
+      const diffTarget = commitCount >= 10 ? 'HEAD~10' : (commitCount > 1 ? `HEAD~${commitCount - 1}` : 'HEAD');
+      const shortstat = exec(`git diff --shortstat ${diffTarget} HEAD`);
       const linesAdded = parseInt(shortstat.match(/(\d+) insertion/)?.[1] || '0');
       const linesDeleted = parseInt(shortstat.match(/(\d+) deletion/)?.[1] || '0');
 
