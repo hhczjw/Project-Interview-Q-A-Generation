@@ -128,27 +128,38 @@ my-project/
 ```bash
 # 1. 部署规则文件到你的项目（选择你使用的 AI 工具）
 
+# Claude Code 用户 — 全局安装（推荐，所有项目可用）
+mkdir -p ~/.claude/commands
+cp src/adapters/claude-code/skill.md ~/.claude/commands/generate-resume.md
+cp src/adapters/claude-code/skill-interview.md ~/.claude/commands/generate-interview.md
+
+# Claude Code 用户 — 项目级安装（只在当前项目可用）
+mkdir -p .claude/commands
+cp src/adapters/claude-code/skill.md .claude/commands/generate-resume.md
+cp src/adapters/claude-code/skill-interview.md .claude/commands/generate-interview.md
+
 # Cursor 用户
 cp src/adapters/cursor/.cursorrules /path/to/your-project/
-
-# Claude Code 用户
-mkdir -p /path/to/your-project/.claude/skills
-cp src/adapters/claude-code/skill.md /path/to/your-project/.claude/skills/generate-resume.md
-cp src/adapters/claude-code/skill-interview.md /path/to/your-project/.claude/skills/generate-interview.md
 
 # Windsurf 用户
 cp src/adapters/windsurf/.windsurfrules /path/to/your-project/
 
-# 2. 在 AI 工具中打开你的项目，然后说：
+# 2. 在 AI 工具中打开你的项目，然后使用：
 ```
 
-**生成简历**：
+**Claude Code 使用斜杠命令**：
+```
+/user:generate-resume          # 生成简历
+/user:generate-interview       # 生成面试问答
+
+# 如果是项目级安装：
+/project:generate-resume       # 生成简历
+/project:generate-interview    # 生成面试问答
+```
+
+**Cursor / Windsurf 使用自然语言**：
 ```
 帮我根据这个项目生成简历
-```
-
-**生成面试问答**：
-```
 帮我根据这个项目准备面试
 ```
 
@@ -265,34 +276,35 @@ console.log(interview.aiPrompt);   // AI 生成 Prompt
 
 ### Claude Code
 
-**项目级安装**（推荐）：
+**全局安装**（推荐，所有项目可用）：
 
 ```bash
-# 在你的项目根目录执行
-mkdir -p .claude/skills
-cp /path/to/skill/src/adapters/claude-code/skill.md .claude/skills/generate-resume.md
-cp /path/to/skill/src/adapters/claude-code/CLAUDE.md ./
+mkdir -p ~/.claude/commands
+cp /path/to/skill/src/adapters/claude-code/skill.md ~/.claude/commands/generate-resume.md
+cp /path/to/skill/src/adapters/claude-code/skill-interview.md ~/.claude/commands/generate-interview.md
 ```
 
-使用方式：
+使用斜杠命令：
 ```
-# 简历生成
-/generate-resume                    # 从零生成
-/generate-resume --lang en          # 英文简历
-/generate-resume --role 前端工程师   # 针对特定岗位
-/import-resume                      # 导入已有简历
-
-# 面试问答
-/generate-interview                 # 生成面试问答
-/generate-interview --role 前端工程师
-/deep-dive React                    # 针对 React 生成追问链
+/user:generate-resume              # 生成简历
+/user:generate-interview           # 生成面试问答
 ```
 
-**全局安装**：
+**项目级安装**（只在当前项目可用，可提交到 Git 共享给团队）：
 
 ```bash
-cp /path/to/skill/src/adapters/claude-code/skill.md ~/.claude/skills/generate-resume.md
+mkdir -p .claude/commands
+cp /path/to/skill/src/adapters/claude-code/skill.md .claude/commands/generate-resume.md
+cp /path/to/skill/src/adapters/claude-code/skill-interview.md .claude/commands/generate-interview.md
 ```
+
+使用斜杠命令：
+```
+/project:generate-resume           # 生成简历
+/project:generate-interview        # 生成面试问答
+```
+
+> 💡 **区别**：`~/.claude/commands/` 是全局命令（`/user:xxx`），`.claude/commands/` 是项目命令（`/project:xxx`）。项目命令可以提交到 Git 仓库，团队成员克隆后直接使用。
 
 ### Cursor
 
